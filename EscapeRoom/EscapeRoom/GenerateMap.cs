@@ -11,8 +11,19 @@ namespace EscapeRoom
 {
     internal class GenerateMap
     {
-        private int mapWidth;
-        private int mapHeight;
+        public int mapWidth;
+        public int mapHeight;
+
+        public int PX;
+        public int PY;
+
+        public int KX;
+        public int KY;
+       
+        public int rndW;
+        public int rndDX;
+        public int rndDY;
+
 
         public GenerateMap(int _width, int _height)
         {
@@ -20,9 +31,17 @@ namespace EscapeRoom
             mapHeight = _height;
         }
 
+        public GenerateMap(int playerX, int playerY, int KeyX, int KeyY) 
+        {
+            PX = playerX;
+            PY = playerY;
+            KX = KeyX;
+            KY = KeyY;
+        }
+
         private ETile[,] mapArray;
 
-        private enum ETile
+        public enum ETile
         {
             free = -1,
             wall,
@@ -49,18 +68,18 @@ namespace EscapeRoom
         public void GenerateM()
         {
             mapArray = new ETile[mapWidth, mapHeight];
+            UserInput input = new UserInput(mapWidth, mapHeight);
+            Random rnd = new Random();            
 
-            Random rnd = new Random();
+            rndW = rnd.Next(1, 5);          // 1 = left wall 2 = upper wall 3 = right wall 4 = lower wall
+            rndDX = rnd.Next(1, mapWidth - 1);
+            rndDY = rnd.Next(1, mapHeight - 1);
 
-            int rndPX = rnd.Next(1, mapWidth - 2);
-            int rndPY = rnd.Next(1, mapHeight - 2);
-
-            int rndKX = rnd.Next(1, mapWidth - 2);
-            int rndKY = rnd.Next(1, mapHeight - 2);
-
-            int rndW = rnd.Next(1, 5);          // 1 = left wall 2 = upper wall 3 = right wall 4 = lower wall
-            int rndDX = rnd.Next(1, mapWidth - 1);
-            int rndDY = rnd.Next(1, mapHeight - 1);
+            while (PX == KX && PY == KY)
+            {
+                KX = rnd.Next(1, mapWidth - 1);
+                KY = rnd.Next(1, mapHeight - 1);
+            }
 
             for (int y = 0; y < mapHeight; y++)
             {
@@ -72,13 +91,13 @@ namespace EscapeRoom
                     {
                         mapArray[x, y] = ETile.wall;
                     }
-                    else if(x == rndPX && y == rndPY)
+                    else if (x == PX && y == PY)
                     {
-                        mapArray[rndPX, rndPY] = ETile.player;
+                        mapArray[x, y] = ETile.player;
                     }
-                    else if( x == rndKX && y == rndKY)
+                    else if (x == KX && y == KY)
                     {
-                        mapArray[rndKX, rndKY] = ETile.key;
+                        mapArray[x, y] = ETile.key;
                     }
                     switch (rndW)
                     {
@@ -111,6 +130,55 @@ namespace EscapeRoom
             }
         }
 
+        public void SetPlayer(string _movement)
+        {
+
+            int newPlayerX = PX;
+            int newPlayerY = PY;
+
+            switch (_movement)
+            {
+                case "w":
+                    newPlayerY--;
+                    break;
+                case "a":
+                    newPlayerX--;
+                    break;
+                case "s":
+                    newPlayerY++;
+                    break;
+                case "d":
+                    newPlayerX++;
+                    break;
+                default:
+                    return; // invalid movement input
+            }
+
+            if (newPlayerX < 0 || newPlayerX >= mapWidth || newPlayerY < 0 || newPlayerY >= mapHeight)
+            {
+                return; // out of bounds
+            }
+
+            if (mapArray[newPlayerX, newPlayerY] == ETile.wall)
+            {
+                return; // hit a wall
+            }
+
+            // clear current player position
+            mapArray[PX, PY] = ETile.free;
+
+            // update new player position
+            PX = newPlayerX;
+            PY = newPlayerY;
+            mapArray[PX, PY] = ETile.player;
+        }
+
+
+        public void RemoveKey()
+        {
+
+        }
+
         public void PrintM()
         {
             string rowString = "";
@@ -123,8 +191,25 @@ namespace EscapeRoom
                 }
                 Console.WriteLine(rowString);
             }
+            
         }
 
-        
+        public bool WinCondition()
+        {
+            for (int y = 0; y < mapHeight; y++)
+            {
+                for (int x = 0; x < mapWidth; x++)
+                {
+                    if (mapArray[x, y] == ETile.player && mapArray[x, y] == ETile.door)
+                    {
+                        Console.WriteLine("Congratulations you escaped!");
+                        return true;
+                    }                   
+                }
+            }
+
+            return false;
+
+        }
     }
 }

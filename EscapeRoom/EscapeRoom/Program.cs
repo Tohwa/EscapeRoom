@@ -10,6 +10,7 @@ namespace EscapeRoom
         {
             int width;
             int height;
+            string movement = "";
 
             UserInput input = new UserInput();
 
@@ -17,13 +18,20 @@ namespace EscapeRoom
             width = input.MapWidth();
 
             GenerateMap genMap = new GenerateMap(width, height);
-
+            
             genMap.GenerateLevel();
 
             // game loop starts here
-            // TODO: 1. player movement ( wasd input - write the player into an adjacent space and delete it from its previous space within the 2DArray)
-            //       2. player interaction with key ( write player on key space and delete the key from it followed by deleting the door within the wall)
-            //       3. script an exit message and a winning message after the player gets writting into the space where the door previous was
+            do
+            {
+                // Console.Clear();
+                
+                movement = input.PlayerMovement();
+                genMap.SetPlayer(movement);
+                genMap.PrintM();
+
+            } while (genMap.WinCondition() == false);
+            
 
         }
 
