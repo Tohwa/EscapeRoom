@@ -20,10 +20,14 @@ namespace EscapeRoom
         public int KX;
         public int KY;
        
-        public int rndW;
-        public int rndDX;
-        public int rndDY;
+        public int W;
+        public int DX;
+        public int DY;
+        public int doorY;
+        public int doorX;
 
+        public bool hasKey = false;
+        public static bool gameLoop = true;
 
         public GenerateMap(int _width, int _height)
         {
@@ -68,17 +72,20 @@ namespace EscapeRoom
         public void GenerateM()
         {
             mapArray = new ETile[mapWidth, mapHeight];
-            UserInput input = new UserInput(mapWidth, mapHeight);
+
             Random rnd = new Random();            
 
-            rndW = rnd.Next(1, 5);          // 1 = left wall 2 = upper wall 3 = right wall 4 = lower wall
-            rndDX = rnd.Next(1, mapWidth - 1);
-            rndDY = rnd.Next(1, mapHeight - 1);
+            W = rnd.Next(1, 5);          // 1 = left wall 2 = upper wall 3 = right wall 4 = lower wall
+            DX = rnd.Next(1, mapWidth - 1);
+            DY = rnd.Next(1, mapHeight - 1);
 
             while (PX == KX && PY == KY)
             {
-                KX = rnd.Next(1, mapWidth - 1);
-                KY = rnd.Next(1, mapHeight - 1);
+                PX = rnd.Next(1, mapWidth - 2);
+                PY = rnd.Next(1, mapHeight - 2);
+
+                KX = rnd.Next(1, mapWidth - 2);
+                KY = rnd.Next(1, mapHeight - 2);
             }
 
             for (int y = 0; y < mapHeight; y++)
@@ -99,30 +106,38 @@ namespace EscapeRoom
                     {
                         mapArray[x, y] = ETile.key;
                     }
-                    switch (rndW)
+                    switch (W)
                     {
                         case 1:     // left wall
-                            if (x == 0 && y == rndDY)
+                            if (x == 0 && y == DY)
                             {
-                                mapArray[x, rndDY] = ETile.door;
+                                mapArray[x, DY] = ETile.door;
+                                doorX = x;
+                                doorY = y;
                             }
                             break;
                         case 2:     // upper wall
-                            if (x == rndDX && y == mapHeight - 1)
+                            if (x == DX && y == mapHeight - 1)
                             {
-                                mapArray[rndDX, y] = ETile.door;
+                                mapArray[DX, y] = ETile.door;
+                                doorX = x;
+                                doorY = y;
                             }
                             break;
                         case 3:     // right wall
-                            if (x == mapWidth - 1 && y == rndDY)
+                            if (x == mapWidth - 1 && y == DY)
                             {
-                                mapArray[x, rndDY] = ETile.door;
+                                mapArray[x, DY] = ETile.door;
+                                doorX = x;
+                                doorY = y;
                             }
                             break;
                         case 4:     // lower wall
-                            if (x == rndDX && y == 0)
+                            if (x == DX && y == 0)
                             {
-                                mapArray[rndDX, y] = ETile.door;
+                                mapArray[DX, y] = ETile.door;
+                                doorX = x;
+                                doorY = y;
                             }
                             break;
                     }                        
@@ -130,57 +145,76 @@ namespace EscapeRoom
             }
         }
 
-        public void SetPlayer(string _movement)
+        public void MovePlayer()
         {
-
+            var input = Console.ReadKey(true);
             int newPlayerX = PX;
             int newPlayerY = PY;
 
-            switch (_movement)
+            switch (input.Key)
             {
-                case "w":
-                    newPlayerY--;
+                case ConsoleKey.UpArrow:
+                    newPlayerY --;
                     break;
-                case "a":
-                    newPlayerX--;
+                case ConsoleKey.LeftArrow:
+                    newPlayerX --;
                     break;
-                case "s":
-                    newPlayerY++;
+                case ConsoleKey.DownArrow:
+                    newPlayerY ++;
                     break;
-                case "d":
-                    newPlayerX++;
+                case ConsoleKey.RightArrow:
+                    newPlayerX ++;
                     break;
                 default:
+                    Console.WriteLine("Please use the Arrowkeys to move nothing else.");
                     return; // invalid movement input
             }
 
             if (newPlayerX < 0 || newPlayerX >= mapWidth || newPlayerY < 0 || newPlayerY >= mapHeight)
             {
-                return; // out of bounds
+                if(hasKey == true)
+                {
+                    WinCondition();
+                }
+                else
+                    return; // out of bounds or escaped if key looted
             }
-
-            if (mapArray[newPlayerX, newPlayerY] == ETile.wall)
+            try
             {
-                return; // hit a wall
+                if (mapArray[newPlayerX, newPlayerY] == ETile.wall || mapArray[newPlayerX, newPlayerY] == ETile.door)
+                {
+                    return; // hit a wall/door
+                }
+                else if (mapArray[newPlayerX, newPlayerY] == ETile.key)
+                {
+                    KeyAquired();
+                }
+                // clear current player position
+                mapArray[PX, PY] = ETile.free;
+
+                // update new player position
+                PX = newPlayerX;
+                PY = newPlayerY;
+                mapArray[PX, PY] = ETile.player;
+
+                PrintM();
             }
-
-            // clear current player position
-            mapArray[PX, PY] = ETile.free;
-
-            // update new player position
-            PX = newPlayerX;
-            PY = newPlayerY;
-            mapArray[PX, PY] = ETile.player;
+            catch(IndexOutOfRangeException)
+            {
+                
+            }            
         }
 
 
-        public void RemoveKey()
+        public void KeyAquired()
         {
-
+            hasKey = true;
+            mapArray[doorX, doorY] = ETile.free;
         }
 
         public void PrintM()
         {
+            Console.Clear();
             string rowString = "";
             for (int y = 0; y < mapHeight; y++)
             {
@@ -188,28 +222,17 @@ namespace EscapeRoom
                 for (int x = 0; x < mapWidth; x++)
                 {
                     rowString += $" {TileStrings[(int)mapArray[x, y] + 1]} ";
+                    
                 }
                 Console.WriteLine(rowString);
             }
             
         }
 
-        public bool WinCondition()
-        {
-            for (int y = 0; y < mapHeight; y++)
-            {
-                for (int x = 0; x < mapWidth; x++)
-                {
-                    if (mapArray[x, y] == ETile.player && mapArray[x, y] == ETile.door)
-                    {
-                        Console.WriteLine("Congratulations you escaped!");
-                        return true;
-                    }                   
-                }
-            }
-
-            return false;
-
+        public void WinCondition()
+        {                   
+            Console.WriteLine("Congratulations you escaped!");
+            gameLoop = false;
         }
     }
 }

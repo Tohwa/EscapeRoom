@@ -10,7 +10,6 @@ namespace EscapeRoom
         {
             int width;
             int height;
-            string movement = "";
 
             UserInput input = new UserInput();
 
@@ -24,13 +23,10 @@ namespace EscapeRoom
             // game loop starts here
             do
             {
-                // Console.Clear();
-                
-                movement = input.PlayerMovement();
-                genMap.SetPlayer(movement);
-                genMap.PrintM();
+                // Console.Clear();                
+                genMap.MovePlayer();
 
-            } while (genMap.WinCondition() == false);
+            } while (GenerateMap.gameLoop == true);
             
 
         }

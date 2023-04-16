@@ -10,24 +10,6 @@ namespace EscapeRoom
 {
     internal class UserInput
     {
-        
-        public static int playerX = 0;
-        public static int playerY = 0;
-
-        public static int KeyX = 0;
-        public static int KeyY = 0;
-        public GenerateMap.ETile[,] mapArray;
-
-        public UserInput(int width, int height)
-        {
-            mapArray = new ETile[width, height];
-
-            // initialize player position to random location
-            
-        }
-
-        public UserInput() { }
-
         public int MapWidth()
         {           
             
@@ -43,13 +25,6 @@ namespace EscapeRoom
             Console.WriteLine("First of all tell us how long the room is:");
             int height = Convert.ToInt32(Console.ReadLine());
             return height;
-        }
-
-        public string PlayerMovement()
-        {           
-            Console.WriteLine("You may move your character with w/a/s/d.");
-            string movement = Convert.ToString(Console.ReadKey(true));
-            return movement;
-        }
+        }        
     }
 }
