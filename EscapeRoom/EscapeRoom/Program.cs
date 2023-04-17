@@ -21,16 +21,9 @@ namespace EscapeRoom
             // game loop starts here
             
             do
-            {
-
-                // Console.Clear();                
+            {               
                 genMap.MovePlayer();
-                           
-                genMap.MovePlayer();
-                Console.Clear();
-                genMap.PrintM();
-
-
+                // Console.SetCursorPosition(0, 0); just dont...
             } while (GenerateMap.gameLoop == true);
             
 

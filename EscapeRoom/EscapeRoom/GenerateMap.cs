@@ -49,7 +49,7 @@ namespace EscapeRoom
         private string[] TileStrings = new string[]
         {
             " ",
-            "x",
+            "X",
             "D",
             "K",
             "P"
@@ -68,8 +68,8 @@ namespace EscapeRoom
             Random rnd = new Random();            
 
             W = rnd.Next(1, 5);          // 1 = left wall 2 = upper wall 3 = right wall 4 = lower wall
-            DX = rnd.Next(1, mapWidth - 1);
-            DY = rnd.Next(1, mapHeight - 1);
+            DX = rnd.Next(1, mapWidth - 2);
+            DY = rnd.Next(1, mapHeight - 2);
 
             while (PX == KX && PY == KY)
             {
