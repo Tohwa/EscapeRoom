@@ -10,6 +10,10 @@ namespace EscapeRoom
 {
     internal class UserInput
     {
+                
+        public UserInput() { }
+
+
         public int MapWidth()
         {           
             

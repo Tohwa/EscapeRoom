@@ -33,15 +33,7 @@ namespace EscapeRoom
         {
             mapWidth = _width;
             mapHeight = _height;
-        }
-
-        public GenerateMap(int playerX, int playerY, int KeyX, int KeyY) 
-        {
-            PX = playerX;
-            PY = playerY;
-            KX = KeyX;
-            KY = KeyY;
-        }
+        }        
 
         private ETile[,] mapArray;
 
@@ -140,9 +132,10 @@ namespace EscapeRoom
                                 doorY = y;
                             }
                             break;
-                    }                        
+                    }
                 }
             }
+
         }
 
         public void MovePlayer()

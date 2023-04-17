@@ -3,9 +3,7 @@
 namespace EscapeRoom
 {
     internal class Program
-    {
-        
-
+    {       
         static void Main(string[] args)
         {
             int width;
@@ -21,10 +19,17 @@ namespace EscapeRoom
             genMap.GenerateLevel();
 
             // game loop starts here
+            
             do
             {
+
                 // Console.Clear();                
                 genMap.MovePlayer();
+                           
+                genMap.MovePlayer();
+                Console.Clear();
+                genMap.PrintM();
+
 
             } while (GenerateMap.gameLoop == true);
             
