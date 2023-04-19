@@ -33,7 +33,9 @@ namespace EscapeRoom
         {
             mapWidth = _width;
             mapHeight = _height;
-        }        
+        }
+
+        ConsoleDesign design = new ConsoleDesign();
 
         private ETile[,] mapArray;
 
@@ -189,7 +191,7 @@ namespace EscapeRoom
                 PX = newPlayerX;
                 PY = newPlayerY;
                 mapArray[PX, PY] = ETile.player;
-
+                
                 PrintM();
             }
             catch(IndexOutOfRangeException)
@@ -207,23 +209,25 @@ namespace EscapeRoom
 
         public void PrintM()
         {
-            Console.Clear();
+            Console.SetCursorPosition(0, 0);
             string rowString = "";
             for (int y = 0; y < mapHeight; y++)
             {
                 rowString = "";
                 for (int x = 0; x < mapWidth; x++)
                 {
-                    rowString += $" {TileStrings[(int)mapArray[x, y] + 1]} ";
-                    
-                }
+                    rowString += $" {TileStrings[(int)mapArray[x, y] + 1]} ";                    
+                }               
                 Console.WriteLine(rowString);
             }
             
         }
 
         public void WinCondition()
-        {                   
+        {
+            design.OriginalSize();
+            Console.Clear();
+            Console.SetCursorPosition(44, 5);
             Console.WriteLine("Congratulations you escaped!");
             gameLoop = false;
         }
